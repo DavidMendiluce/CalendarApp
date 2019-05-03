@@ -1,1 +1,1 @@
-# CalendarApp
+﻿This is a Calendar scheduling application
