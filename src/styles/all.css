@@ -42,6 +42,7 @@ body {
 }
 
 .calendar {
+  top: 100px;
   background: white;
   width: 840px;
   height: 490px;
@@ -101,8 +102,15 @@ body {
   .calendar .calendar-change-year {
     font-size: 20px; }
     .calendar .calendar-change-year .calendar-change-year-slider {
-      margin: 15px 0;
+      margin: 10px 0;
       color: #737373; }
+    .calendar .calendar-change-year .calendar-change-year-slider-prev {
+      position: relative;
+      right: 10px; }
+    .calendar .calendar-change-year .calendar-change-year-slider-next {
+        position: relative;
+        left: 10px;
+       }
     .calendar .calendar-change-year .calendar-change-year-slider .fa:hover {
       color: #404040; }
   .calendar .calendar-days, .calendar .calendar-week, .calendar .calendar-month {

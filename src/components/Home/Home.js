@@ -5,6 +5,7 @@ import {PostData} from '../../services/PostData';
 import { confirmAlert } from 'react-confirm-alert';
 import '../../styles/all.css';
 import '../../bower/font-awesome/css/font-awesome.min.css';
+import {Calendar} from './calendar.js';
 
 
 class Home extends Component {
@@ -46,9 +47,9 @@ return (
       <div className="calendar-left-side-day-of-week"></div>
     </div>
     <div className="current-day-events">
-      <div>Tareas por hacer:</div>
+      <div></div>
       <ul className="current-day-events-list">
-        <li>alguna tarea</li>
+        <li></li>
       </ul>
       </div>
       <div className="add-event-day">
@@ -62,8 +63,8 @@ return (
     <div className="text-right calendar-change-year">
       <div className="calendar-change-year-slider">
         <span className="fa fa-caret-left cursor-pointer calendar-change-year-slider-prev"></span>
-        <span className="calendar-current-year">2019</span>
-        <span className="fa fa-caret-right cursor-pointer calendar-change-year-slider-next" id="addButton"></span>
+        <span className="calendar-current-year"></span>
+        <span className="fa fa-caret-right cursor-pointer calendar-change-year-slider-next"></span>
      </div>
    </div>
 
@@ -79,16 +80,14 @@ return (
     </div>
     <div className="calendar-day-list">
       <ul className="calendar-days">
-        <li data-day="01"></li>
-        <li data-day="02"></li>
-
       </ul>
 </div>
 </div>
 </div>
 <a href="#" onClick={this.logout} className="logout">Logout</a>
 </div>
-</div>
+</div>,
+<Calendar />
 );
 }
 }
