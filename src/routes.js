@@ -6,6 +6,7 @@ import Login from '././components/Login/Login';
 import Signup from '././components/Signup/Signup';
 import NotFound from '././components/NotFound/NotFound';
 
+
 const Routes = () => (
 <BrowserRouter >
 <Switch>
@@ -13,7 +14,7 @@ const Routes = () => (
 <Route path="/home" component={Home}/>
 <Route path="/login" component={Login}/>
 <Route path="/Signup" component={Signup}/>
-<Route path="*" component={NotFound}/>
+<Route path="/*" component={NotFound}/>
 </Switch>
 </BrowserRouter>
 );

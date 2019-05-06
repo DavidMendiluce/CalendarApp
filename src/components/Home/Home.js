@@ -3,13 +3,12 @@ import {Redirect} from 'react-router-dom';
 import './Home.css';
 import {PostData} from '../../services/PostData';
 import { confirmAlert } from 'react-confirm-alert';
-import '../../styles/all.css';
+import './Home.css';
 import '../../bower/font-awesome/css/font-awesome.min.css';
-import {Calendar} from './calendar.js';
+import Calendar from './calendar.js'
 
 
 class Home extends Component {
-
 constructor(props) {
 super(props);
 
@@ -17,6 +16,7 @@ this.state = {
 data:[],
 redirectToReferrer: false,
 name:'',
+date: new Date()
 };
 
 this.logout = this.logout.bind(this);
@@ -30,6 +30,12 @@ sessionStorage.clear();
 this.setState({redirectToReferrer: true});
 }
 
+calendar() {
+  return window.location.href= '../components/Calendar/calendar.html';
+}
+
+
+
 render() {
 if (this.state.redirectToReferrer) {
 return (<Redirect to={'/login'}/>)
@@ -37,57 +43,10 @@ return (<Redirect to={'/login'}/>)
 
 
 return (
-<div className="row" id="Body">
-<div className="medium-12 columns">
-
-<div className="calendar disable-selection" id="calendar">
-  <div className="left-side">
-    <div className="current-day text-center">
-      <h1 className="calendar-left-side-day"></h1>
-      <div className="calendar-left-side-day-of-week"></div>
-    </div>
-    <div className="current-day-events">
-      <div></div>
-      <ul className="current-day-events-list">
-        <li></li>
-      </ul>
-      </div>
-      <div className="add-event-day">
-        <input type="text" className="add-event-day" placeholder="Create an Event" />
-        <span class="fa fa-plus-circle cursor-pointer add-event-day-field-btn"></span>
-    </div>
+  <div>
+  <a href="#" onClick={this.logout} className="logout">Logout</a>
+  <Calendar />
   </div>
-
-
-  <div className="right-side">
-    <div className="text-right calendar-change-year">
-      <div className="calendar-change-year-slider">
-        <span className="fa fa-caret-left cursor-pointer calendar-change-year-slider-prev"></span>
-        <span className="calendar-current-year"></span>
-        <span className="fa fa-caret-right cursor-pointer calendar-change-year-slider-next"></span>
-     </div>
-   </div>
-
-   <div className="calendar-month-list">
-     <ul className="calendar-month">
-       <li>May</li>
-     </ul>
-    </div>
-    <div className="calendar-week-list">
-     <ul className="calendar-week">
-       <li>Vie</li>
-     </ul>
-    </div>
-    <div className="calendar-day-list">
-      <ul className="calendar-days">
-      </ul>
-</div>
-</div>
-</div>
-<a href="#" onClick={this.logout} className="logout">Logout</a>
-</div>
-</div>,
-<Calendar />
 );
 }
 }

@@ -1,249 +1,159 @@
-const AVAILABLE_WEEK_DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const localStorageName = 'calendar-events';
 import '../../../node_modules/jquery/dist/jquery.min.js';
+import React, {Component} from 'react';
+import moment from 'moment';
+
+export default class Calendar extends React.Component {
+  state = {
+    dateContext: moment(),
+    today: moment(),
+    showMonthPopup: false,
+    showYearPopup: false
+  }
+
+  constructor(props) {
+    super(props);
+    this.width = props.width || "350px";
+    this.style = props.style || {};
+  }
+
+  weekdays = moment.weekdays();
+  weekdaysShort = moment.weekdaysShort();
+  months = moment.monthsShort();
 
 
-export class Calendar {
-    constructor(options) {
-        this.options = options;
-        this.elements = {
-            days: document.getElementsByClassName("calendar-days"),
-            week: document.getElementsByClassName("calendar-week"),
-            month: document.getElementsByClassName("calendar-month"),
-            year: document.getElementsByClassName("calendar-current-year"),
-            eventList: document.getElementsByClassName("current-day-events-list"),
-            eventField: document.getElementsByClassName("add-event-day-field"),
-            eventAddBtn: document.getElementsByClassName("add-event-day-field-btn"),
-            currentDay: document.getElementsByClassName("calendar-left-side-day"),
-            currentWeekDay: document.getElementsByClassName("calendar-left-side-day-of-week"),
-            prevYear: document.getElementsByClassName("calendar-change-year-slider-prev"),
-            nextYear: document.getElementsByClassName("calendar-change-year-slider-next")
-        };
+  year = () => {
+    return this.state.dateContext.format("Y");
+  }
 
-        this.eventList = JSON.parse(localStorage.getItem(localStorageName)) || {};
+  month = () => {
+    return this.state.dateContext.format("MMMM");
+  }
 
-        this.date = +new Date();
-        this.options.maxDays = 37;
-        this.init();
+  daysInMonth = () => {
+    return this.state.dateContext.daysInMonth();
+  }
+
+  currentDate = () => {
+    return this.state.dateContext.get("date");
+  }
+
+  currentDay = () => {
+    return this.state.dateContext.format("D");
+  }
+
+  firstDayOfMonth = () => {
+    let dateContext = this.state.dateContext;
+    let firstDay = moment(dateContext).startOf('month').format('d');
+    return firstDay;
+  }
+
+  setMonth = (month) => {
+    let monthNo = this.months.indexOf(month);
+    let dateContext = Object.assign({}, this.state.dateContext);
+    dateContext = moment(dateContext).set("month", monthNo);
+    this.setState({
+      dateContext: dateContext
+    });
+  }
+  onChangeMonth = (e, data) => {
+      this.setMonth(data)
+  }
+
+  monthNav = () => {
+    return (
+      <li className="calendar-month"
+        onClick={(e)=> {this.onChangeMonth(e, this.month())}}>
+        {this.month()}
+      </li>
+    );
+  }
+
+
+  render() {
+    let weekdays = this.weekdaysShort.map((day) => {
+      return (
+        <li key={day} className="calendar-week">{day} </li>
+      )
+    });
+
+    let blanks = [];
+    for (let i = 0; i < this.firstDayOfMonth(); i++) {
+      blanks.push(<li className="emptySlot">{""}</li>);
     }
 
-// App methods
-    init() {
-        if (!this.options.id) return false;
-        this.eventsTrigger();
-        this.drawAll();
+    let daysInMonth = [];
+    for (let d = 1; d <= this.daysInMonth(); d++) {
+      let className = (d == this.currentDay() ? "day current-day": "day");
+      daysInMonth.push(
+        <li key={d} className="calendar-days">
+          {d}
+        </li>
+      )
     }
 
-    // draw Methods
-    drawAll() {
-        this.drawWeekDays();
-        this.drawMonths();
-        this.drawDays();
-        this.drawYearAndCurrentDay();
-        this.drawEvents();
-
-    }
-
-    drawEvents() {
-        let calendar = this.getCalendar();
-        let eventList = this.eventList[calendar.active.formatted] || ['There is not any events'];
-        let eventTemplate = "";
-        eventList.forEach(item => {
-            eventTemplate += `<li>${item}</li>`;
-        });
-
-        this.elements.eventList.innerHTML = eventTemplate;
-    }
-
-    drawYearAndCurrentDay() {
-        let calendar = this.getCalendar();
-        this.elements.year.innerHTML = calendar.active.year;
-        this.elements.currentDay.innerHTML = calendar.active.day;
-        this.elements.currentWeekDay.innerHTML = AVAILABLE_WEEK_DAYS[calendar.active.week];
-    }
-
-    drawDays() {
-        let calendar = this.getCalendar();
-
-        let latestDaysInPrevMonth = this.range(calendar.active.startWeek).map((day, idx) => {
-            return {
-                dayNumber: this.countOfDaysInMonth(calendar.pMonth) - idx,
-                month: new Date(calendar.pMonth).getMonth(),
-                year: new Date(calendar.pMonth).getFullYear(),
-                currentMonth: false
-            }
-        }).reverse();
+    let monthsRow = this.months.map((month) => {
+      return (
+        <li key={month} className="calendar-month">{month} </li>
+      )
+    });
 
 
-        let daysInActiveMonth = this.range(calendar.active.days).map((day, idx) => {
-            let dayNumber = idx + 1;
-            let today = new Date();
-            return {
-                dayNumber,
-                today: today.getDate() === dayNumber && today.getFullYear() === calendar.active.year && today.getMonth() === calendar.active.month,
-                month: calendar.active.month,
-                year: calendar.active.year,
-                selected: calendar.active.day === dayNumber,
-                currentMonth: true
-            }
-        });
 
 
-        let countOfDays = this.options.maxDays - (latestDaysInPrevMonth.length + daysInActiveMonth.length);
-        let daysInNextMonth = this.range(countOfDays).map((day, idx) => {
-            return {
-                dayNumber: idx + 1,
-                month: new Date(calendar.nMonth).getMonth(),
-                year: new Date(calendar.nMonth).getFullYear(),
-                currentMonth: false
-            }
-        });
 
-        let days = [...latestDaysInPrevMonth, ...daysInActiveMonth, ...daysInNextMonth];
+    return (
+      <div className="row" id="Body">
+      <div className="medium-12 columns">
 
-        days = days.map(day => {
-            let newDayParams = day;
-            let formatted = this.getFormattedDate(new Date(`${Number(day.month) + 1}/${day.dayNumber}/${day.year}`));
-            newDayParams.hasEvent = this.eventList[formatted];
-            return newDayParams;
-        });
-
-        let daysTemplate = "";
-        days.forEach(day => {
-            daysTemplate += `<li class="${day.currentMonth ? '' : 'another-month'}${day.today ? ' active-day ' : ''}${day.selected ? 'selected-day' : ''}${day.hasEvent ? ' event-day' : ''}" data-day="${day.dayNumber}" data-month="${day.month}" data-year="${day.year}"></li>`
-        });
-
-        this.elements.days.innerHTML = daysTemplate;
-    }
-
-    drawMonths() {
-        let availableMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        let monthTemplate = "";
-        let calendar = this.getCalendar();
-        availableMonths.forEach((month, idx) => {
-            monthTemplate += `<li class="${idx === calendar.active.month ? 'active' : ''}" data-month="${idx}">${month}</li>`
-        });
-
-        this.elements.month.innerHTML = monthTemplate;
-    }
-
-    drawWeekDays() {
-        let weekTemplate = "";
-        AVAILABLE_WEEK_DAYS.forEach(week => {
-            weekTemplate += `<li>${week.slice(0, 3)}</li>`
-        });
-
-        this.elements.week.innerHTML = weekTemplate;
-    }
-
-    // Service methods
-    eventsTrigger() {
-
-          this.elements.prevYear.addEventListener('click' => {
-          let calendar = this.getCalendar();
-          this.updateTime(calendar.pYear);
-          this.drawAll()
-        });
-
-        this.elements.nextYear.addEventListener('click', e => {
-            let calendar = this.getCalendar();
-            this.updateTime(calendar.nYear);
-            this.drawAll()
-        });
-
-        this.elements.month.addEventListener('click', e => {
-            let calendar = this.getCalendar();
-            let month = e.srcElement.getAttribute('data-month');
-            if (!month || calendar.active.month == month) return false;
-
-            let newMonth = new Date(calendar.active.tm).setMonth(month);
-            this.updateTime(newMonth);
-            this.drawAll()
-        });
+      <div className="calendar disable-selection" id="calendar">
+        <div className="left-side">
+          <div className="current-day text-center">
+            <h1 className="calendar-left-side-day"></h1>
+            <div className="calendar-left-side-day-of-week"></div>
+          </div>
+          <div className="current-day-events">
+            <div></div>
+            <ul className="current-day-events-list">
+              <li></li>
+            </ul>
+            </div>
+            <div className="add-event-day">
+              <input type="text" className="add-event-day" placeholder="Create an Event" />
+              <span class="fa fa-plus-circle cursor-pointer add-event-day-field-btn"></span>
+          </div>
+        </div>
 
 
-        this.elements.days.addEventListener('click', e => {
-            let element = e.srcElement;
-            let day = element.getAttribute('data-day');
-            let month = element.getAttribute('data-month');
-            let year = element.getAttribute('data-year');
-            if (!day) return false;
-            let strDate = `${Number(month) + 1}/${day}/${year}`;
-            this.updateTime(strDate);
-            this.drawAll()
-        });
+        <div className="right-side">
+          <div className="text-right calendar-change-year">
+            <div className="calendar-change-year-slider">
+              <span className="fa fa-caret-left cursor-pointer calendar-change-year-slider-prev"></span>
+              <span className="calendar-current-year">2019</span>
+              <span className="fa fa-caret-right cursor-pointer calendar-change-year-slider-next"></span>
+           </div>
+         </div>
 
+         <div className="calendar-month-list">
+           <ul id="mes" className="calendar-month">
+             {monthsRow}
+           </ul>
+          </div>
+          <div className="calendar-week-list">
+           <ul className="calendar-week">
+             {weekdays}
+           </ul>
+          </div>
+          <div className="calendar-day-list">
+            <ul className="calendar-days">
+              {daysInMonth}
 
-        this.elements.eventAddBtn.addEventListener('click', e => {
-            let fieldValue = this.elements.eventField.value;
-            if (!fieldValue) return false;
-            let dateFormatted = this.getFormattedDate(new Date(this.date));
-            if (!this.eventList[dateFormatted]) this.eventList[dateFormatted] = [];
-            this.eventList[dateFormatted].push(fieldValue);
-            localStorage.setItem(localStorageName, JSON.stringify(this.eventList));
-            this.elements.eventField.value = '';
-            this.drawAll()
-        });
+            </ul>
+      </div>
+      </div>
+      </div>
+      </div>
+      </div>
 
-
-    }
-
-
-    updateTime(time) {
-        this.date = +new Date(time);
-    }
-
-    getCalendar() {
-        let time = new Date(this.date);
-
-        return {
-            active: {
-                days: this.countOfDaysInMonth(time),
-                startWeek: this.getStartedDayOfWeekByTime(time),
-                day: time.getDate(),
-                week: time.getDay(),
-                month: time.getMonth(),
-                year: time.getFullYear(),
-                formatted: this.getFormattedDate(time),
-                tm: +time
-            },
-            pMonth: new Date(time.getFullYear(), time.getMonth() - 1, 1),
-            nMonth: new Date(time.getFullYear(), time.getMonth() + 1, 1),
-            pYear: new Date(new Date(time).getFullYear() - 1, 0, 1),
-            nYear: new Date(new Date(time).getFullYear() + 1, 0, 1)
-        }
-    }
-
-    countOfDaysInMonth(time) {
-        let date = this.getMonthAndYear(time);
-        return new Date(date.year, date.month + 1, 0).getDate();
-    }
-
-    getStartedDayOfWeekByTime(time) {
-        let date = this.getMonthAndYear(time);
-        return new Date(date.year, date.month, 1).getDay();
-    }
-
-    getMonthAndYear(time) {
-        let date = new Date(time);
-        return {
-            year: date.getFullYear(),
-            month: date.getMonth()
-        }
-    }
-
-    getFormattedDate(date) {
-        return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
-    }
-
-    range(number) {
-        return new Array(number).fill().map((e, i) => i);
-    }
+    );
+  }
 }
-
-
-(function () {
-    new Calendar({
-        id: "calendar"
-    })
-})();
