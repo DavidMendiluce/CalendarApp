@@ -43,7 +43,7 @@ body {
 
 .calendar {
   top: 100px;
-  background: white;
+  background: rgba(177,176,176, 0.5);
   width: 840px;
   height: 490px;
   border-radius: 10px;
@@ -59,7 +59,7 @@ body {
     height: 100%; }
   .calendar .left-side {
     width: 320px;
-    background: #ec364f;
+    background: rgba(123,209,254, 0.7);
     float: left; }
   .calendar .current-day, .calendar .current-day-events {
     padding-top: 40px; }
@@ -146,7 +146,7 @@ body {
     .calendar .calendar-days li:hover:after, .calendar .calendar-days li.selected-day:after, .calendar .calendar-days li.event-day:before, .calendar .calendar-days li.active-day:after {
       border-radius: 50%; }
     .calendar .calendar-days li:hover:after, .calendar .calendar-days li.selected-day:after {
-      background: rgba(204,204,204, 0.4);
+      background: rgba(221,235,255, 0.4);
        }
     .calendar .calendar-days li.event-day:before {
       content: ' ';

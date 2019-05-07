@@ -5,7 +5,7 @@ import moment from 'moment';
 export default class Calendar extends React.Component {
   state = {
     dateContext: moment(),
-    today: moment(),
+    today: moment(new Date()),
     showMonthPopup: false,
     showYearPopup: false
   }
@@ -19,7 +19,7 @@ export default class Calendar extends React.Component {
   weekdays = moment.weekdays();
   weekdaysShort = moment.weekdaysShort();
   months = moment.monthsShort();
-
+  dayToday = this.state.dateContext.date();
 
   year = () => {
     return this.state.dateContext.format("Y");
@@ -47,6 +47,28 @@ export default class Calendar extends React.Component {
     return firstDay;
   }
 
+  onSelectChange = (e, data) => {
+    this.setMonth(data);
+  }
+
+  SelectList = (props) => {
+    let popup = props.data.map((data) => {
+      return (
+        <div key={data}>
+          <a href="#" onClick={(e) => {this.onSelectChange(e, data)}}>
+          {data}
+          </a>
+        </div>
+      );
+    });
+
+    return (
+      <div className="month-popup">
+      {popup}
+      </div>
+    );
+  }
+
   setMonth = (month) => {
     let monthNo = this.months.indexOf(month);
     let dateContext = Object.assign({}, this.state.dateContext);
@@ -56,17 +78,22 @@ export default class Calendar extends React.Component {
     });
   }
   onChangeMonth = (e, data) => {
-      this.setMonth(data)
+      this.setState({
+        showMonthPopup: !this.state.showMonthPopup
+      });
   }
 
   monthNav = () => {
     return (
       <li className="calendar-month"
-        onClick={(e)=> {this.onChangeMonth(e, this.month())}}>
+      >
         {this.month()}
+
       </li>
     );
   }
+
+
 
 
   render() {
@@ -91,24 +118,23 @@ export default class Calendar extends React.Component {
       )
     }
 
-    let monthsRow = this.months.map((month) => {
+    let monthsRow = this.months.map((month, monthCheck) => {
       return (
         <li key={month} className="calendar-month">{month} </li>
+
       )
     });
 
-
-
-
-
+    let dayToday = this.dayToday;
     return (
       <div className="row" id="Body">
       <div className="medium-12 columns">
 
       <div className="calendar disable-selection" id="calendar">
+
         <div className="left-side">
           <div className="current-day text-center">
-            <h1 className="calendar-left-side-day"></h1>
+            <h1 className="calendar-left-side-day">{dayToday}</h1>
             <div className="calendar-left-side-day-of-week"></div>
           </div>
           <div className="current-day-events">
@@ -119,7 +145,7 @@ export default class Calendar extends React.Component {
             </div>
             <div className="add-event-day">
               <input type="text" className="add-event-day" placeholder="Create an Event" />
-              <span class="fa fa-plus-circle cursor-pointer add-event-day-field-btn"></span>
+              <span className="fa fa-plus-circle cursor-pointer add-event-day-field-btn"></span>
           </div>
         </div>
 
@@ -133,9 +159,10 @@ export default class Calendar extends React.Component {
            </div>
          </div>
 
-         <div className="calendar-month-list">
-           <ul id="mes" className="calendar-month">
+         <div className="calendar-month-list" >
+           <ul className="calendar-month" >
              {monthsRow}
+
            </ul>
           </div>
           <div className="calendar-week-list">
@@ -146,12 +173,12 @@ export default class Calendar extends React.Component {
           <div className="calendar-day-list">
             <ul className="calendar-days">
               {daysInMonth}
-
             </ul>
       </div>
       </div>
       </div>
       </div>
+
       </div>
 
     );
